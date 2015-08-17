@@ -7,6 +7,7 @@ Note: You may not slant the container.
 #include<string>
 #include<vector>
 #include <algorithm>
+#include<time.h>
 using std::string;
 using std::cout;
 using std::endl;
@@ -16,99 +17,39 @@ using std::min;
 
 class Solution {
 public:
-    int maxArea(vector<int>& height) {
-        if(height.empty() || height.size()==1)
-			return 0;
-		int num = height.size();
-		int left = 0,right = num - 1,tempA;
-		int maxA = 0;
-		for(left =0;left<num-1;left++){
-			right = left;
-			while(right<num -1){
-				right = maxInd(height,right+1,num);
-				tempA = (right - left)*min(height[left],height[right]);
-				if(maxA < tempA){
-					maxA = tempA;
-				}				
-			}
-		}
-		return maxA;
-    }
-	
-	int maxArea1(vector<int>& height) {
-        if(height.empty() || height.size()==1)
-			return 0;
-		int num = height.size();
-		vector<int> left,right;
-		int leftLen=0,rightLen=0;
-		int first = 0,second = 1,temp;
-		for(int i=2;i<num;i++){
-			if(height[i]>min(height[first],height[second])){
-				first = second;
-				second = i;
-			}
-		}
-		int maxA = (second - first)*min(height[first],height[second]);
-		left.push_back(first);
-		right.push_back(second);
-		leftLen++;
-		rightLen++;
-		int tempL,tempR,tempA;
-		while(left[leftLen-1]>0 || right[rightLen-1]<num-1){
-			if(left[leftLen-1]>0){
-				tempL = maxInd(height,0,left[leftLen-1]);
-				leftLen ++ ;
-				left.push_back(tempL);
-				int i=rightLen-1;
-				for(;height[right[i]]<height[tempL];i--){
-					tempA = height[right[i]] * (right[i] - tempL);
-					if(maxA < tempA)
-						maxA = tempA;
-					
-				}
-				tempA = height[tempL] * (right[i] - tempL);
-				if(maxA < tempA)
-					maxA  = tempA;				
-			}
-			
-			if(right[rightLen-1]<num-1){
-				tempR = maxInd(height,right[rightLen-1]+1,num);
-				rightLen ++;
-				right.push_back(tempR);
-				int i = leftLen -1;
-				for(; height[left[i]]<height[tempR];i--){
-					tempA = height[left[i]] * (tempR - left[i]);
-					if(maxA < tempA)
-						maxA = tempA;
-				}
-				tempA = height[tempR] * (tempR - left[i]);
-				if(maxA < tempA)
-					maxA = tempA;				
-			}
-		}		
-		return maxA;
-    }
 
-	int maxInd(vector<int>& height,int start,int end){
-		int maxPos = start;
-		int maxH = height[start];
-		if(end - start == 1)
-			return maxPos;
-		for(int i=start;i<end;i++){
-			if(maxH < height[i]){
-				maxPos = i;
-				maxH = height[i];
-			}		
+	int maxArea(vector<int> & height) {
+		int left = 0, right = height.size() - 1, maxA = 0;
+		//while (left < right) maxA = max(maxA,(right - left) * (height[left] < height[right] ? height[left++] : height[right--]));
+		while (left < right) {
+			if (height[left] < height[right]) {
+				maxA = max((right - left)*height[left], maxA);
+				left++;
+			}
+			else {
+				maxA = max((right - left)*height[right],maxA);
+				right--;
+			}
 		}
-		return maxPos;
+		return maxA;
 	}
+
+
+	
 };
 
-int main(){
-	int hArray[]={2,3,10,5,7,8,9};
+int main() {
+	clock_t timeStart = clock();
+	int hArray[] = { 2,3,10,5,7,8,9 };
 	vector<int> test;
-	vector<int> height(hArray,hArray+7);
+	vector<int> height(hArray, hArray + 7);
+	vector<int> height1;
+	for (int i = 0; i < 100000; i++) {
+		height1.push_back(i + 1);
+	}
 	Solution solution;
-	cout<<solution.maxArea1(height);
+	cout << solution.maxArea(height)<<endl;
+	cout << solution.maxArea(height1)<<endl;
+	cout << "Time: " << (double)(clock() - timeStart)/CLOCKS_PER_SEC << endl;
 	return 0;
 }
